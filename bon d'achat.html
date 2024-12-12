@@ -1,0 +1,218 @@
+<?php
+include 'db_conn.php'; 
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Bon d'Achat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alignement du contenu en haut */
+            height: 100vh;
+            padding-top: 180px; /* Ajout d'une marge pour déplacer le formulaire vers le bas */
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .input-group select {
+            cursor: pointer;
+        }
+        .input-group input[type="checkbox"] {
+            width: auto;
+            display: inline-block;
+        }
+        .add-article-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .add-article-btn:hover {
+            background-color: #218838;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .total-section {
+            margin-top: 30px;
+            font-size: 18px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Créer un Bon d'Achat</h1>
+        <form method="POST" action="create_bon_achat.php">
+            <!-- Fournisseur global -->
+            <div class="input-group">
+                <label for="fournisseur">Fournisseur Principal :</label>
+                <select name="fournisseur_id" required>
+                    <option value="">-- Sélectionnez un fournisseur principal --</option>
+                    <?php
+            // Requête pour récupérer les fournisseurs
+            $result = $conn->query("SELECT id, nom FROM fournisseur");
+            
+            if ($result->num_rows > 0) {
+                // Parcours des résultats pour afficher chaque fournisseur dans une option
+                while ($row = $result->fetch_assoc()) {
+                    echo "<option value='{$row['id']}'>{$row['nom']}</option>";
+                }
+            } else {
+                echo "<option value=''>Aucun fournisseur disponible</option>";
+            }
+            ?>
+                </select>
+            </div>
+
+            <!-- Articles -->
+            <div id="articles">
+                <div class="article">
+                    <div class="input-group">
+                        <label for="nom">Nom du Produit :</label>
+                        <input type="text" name="nom[]" placeholder="Nom du Produit" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="reference">Référence :</label>
+                        <input type="text" name="reference[]" placeholder="Référence">
+                    </div>
+                    <div class="input-group">
+                        <label for="categorie">Catégorie :</label>
+                        <select name="categorie[]" required>
+                            <option value="">-- Sélectionnez une catégorie --</option>
+                            <option value="prothese">Prothèse</option>
+                            <option value="outils">Outils Dentaires</option>
+                            <option value="materiel">Matériel Médical</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="description">Description :</label>
+                        <input type="text" name="description[]" placeholder="Description">
+                    </div>
+                    <div class="input-group">
+                        <label for="quantite">Quantité :</label>
+                        <input type="number" name="quantite[]" placeholder="Quantité" required oninput="calculateTotal()">
+                    </div>
+                    <div class="input-group">
+                        <label for="prix">Prix Unitaire :</label>
+                        <input type="number" step="0.01" name="prix[]" placeholder="Prix Unitaire" required oninput="calculateTotal()">
+                    </div>
+                    <div class="input-group">
+                        <label for="date_expiration">Date d'Expiration :</label>
+                        <input type="date" name="date_expiration[]">
+                    </div>
+                    <!-- Fournisseur spécifique pour cet article -->
+                    <div class="input-group">
+                        <label for="marque_fournisseur">Fournisseur de l'Article :</label>
+                        <select name="marque_fournisseur[]" required>
+                            <option value="">-- Sélectionnez un fournisseur --</option>
+                            <?php
+                            // Réinitialisation du pointeur pour afficher à nouveau les fournisseurs
+                            $result->data_seek(0); 
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id']}'>{$row['nom']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="add-article-btn" onclick="addArticle()">Ajouter un Article</button>
+
+            <!-- Montant Total -->
+            <div class="total-section">
+                <p id="total">Montant Total: 0.00</p>
+            </div>
+
+            <!-- Section Paiement -->
+            <div class="input-group">
+                <label for="mode_paiement">Mode de Paiement :</label>
+                <select name="mode_paiement" required>
+                    <option value="">-- Sélectionnez un mode de paiement --</option>
+                    <option value="carte_bancaire">Carte Bancaire</option>
+                    <option value="virement">Virement</option>
+                    <option value="cheque">Chèque</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="montant_paiement">Montant Total :</label>
+                <input type="number" step="0.01" name="montant_paiement" id="montant_paiement" required readonly>
+            </div>
+
+            <!-- Validation -->
+            <button type="submit" class="submit-btn">Créer Bon d'Achat</button>
+        </form>
+    </div>
+
+    <script>
+        function addArticle() {
+            const articlesDiv = document.getElementById('articles');
+            const newArticle = document.querySelector('.article').cloneNode(true);
+            newArticle.querySelectorAll('input, select').forEach(input => input.value = '');
+            articlesDiv.appendChild(newArticle);
+        }
+
+        // Fonction pour calculer le montant total
+        function calculateTotal() {
+            const quantites = document.querySelectorAll('input[name="quantite[]"]');
+            const prixUnitaires = document.querySelectorAll('input[name="prix[]"]');
+            let total = 0;
+
+            for (let i = 0; i < quantites.length; i++) {
+                const quantite = parseFloat(quantites[i].value) || 0;
+                const prixUnitaire = parseFloat(prixUnitaires[i].value) || 0;
+                total += quantite * prixUnitaire;
+            }
+
+            // Afficher le montant total
+            document.getElementById('total').textContent = `Montant Total: ${total.toFixed(2)}`;
+            document.getElementById('montant_paiement').value = total.toFixed(2);
+        }
+    </script>
+</body>
+</html>
