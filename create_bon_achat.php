@@ -1,5 +1,5 @@
 <?php
-include 'db_connection.php';
+include 'db-conne.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Étape 1 : Récupérer les données du formulaire
@@ -8,7 +8,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $references = $_POST['reference'];
     $categories = $_POST['categorie'];
     $descriptions = $_POST['description'];
-    $marques = $_POST['marque_fournisseur'];
     $quantites = $_POST['quantite'];
     $prix = $_POST['prix'];
     $dates_expiration = $_POST['date_expiration'];
@@ -20,34 +19,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $montant_total += $quantite * $prix[$key];
     }
 
-    // Étape 3 : Insertion du bon d'achat
-    $sql_bon = "INSERT INTO bon_achat (fournisseur_id, montant_total) VALUES ('$fournisseur_id', '$montant_total')";
-    if ($conn->query($sql_bon) === TRUE) {
+    // Étape 3 : Générer un numéro unique pour le bon d'achat
+    $numero_bon = 'BON_' . date('YmdHis') . rand(1000, 9999);
+
+    // Étape 4 : Insertion du bon d'achat avec une requête préparée
+    $sql_bon = $conn->prepare("INSERT INTO bon_achat (numero_bon, fournisseur_id, montant_total) VALUES (?, ?, ?)");
+    $sql_bon->bind_param("sii", $numero_bon, $fournisseur_id, $montant_total); // 's' pour string, 'i' pour int
+    if ($sql_bon->execute()) {
         $bon_id = $conn->insert_id; // Récupérer l'ID du bon d'achat ajouté
 
-        // Étape 4 : Insertion des articles associés
+        // Étape 5 : Insertion des articles associés
         $sql_article = $conn->prepare("
             INSERT INTO article_bon 
-            (bon_achat_id, nom, reference, categorie, description, marque_fournisseur, quantite, prix_unitaire, total, date_expiration, is_prothese) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (bon_achat_id, nom, reference, categorie, description, quantite, prix_unitaire, total, date_expiration, is_prothese) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-
+        
+        // Boucle pour insérer chaque article
         foreach ($noms as $key => $nom) {
             $reference = $references[$key];
             $categorie = $categories[$key];
             $description = $descriptions[$key];
-            $marque = $marques[$key];
             $quantite = $quantites[$key];
             $prix_unitaire = $prix[$key];
             $total = $quantite * $prix_unitaire;
             $date_expiration = $dates_expiration[$key] ? $dates_expiration[$key] : NULL;
             $is_prothese = isset($is_protheses[$key]) ? 1 : 0;
 
-            $sql_article->bind_param("isssssiddsi", $bon_id, $nom, $reference, $categorie, $description, $marque, $quantite, $prix_unitaire, $total, $date_expiration, $is_prothese);
+            // Binding des paramètres
+            $sql_article->bind_param("isssssidds", $bon_id, $nom, $reference, $categorie, $description, $quantite, $prix_unitaire, $total, $date_expiration, $is_prothese);
             $sql_article->execute();
         }
 
-        echo "Bon d'achat créé avec succès ! Numéro : $bon_id";
+        echo "Bon d'achat créé avec succès ! Numéro : $numero_bon";
     } else {
         echo "Erreur lors de la création du bon d'achat : " . $conn->error;
     }

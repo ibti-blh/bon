@@ -1,0 +1,457 @@
+/* General Styling */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
+
+/* CSS pseudo-class matches the root element of a tree */
+:root { 
+  --blue: #6475af; 
+  --black: #333; 
+  --white: #fff; 
+  --light-color: #666; 
+  --light-bg: #eee; 
+  --border: .2rem solid rgba(0, 0, 0, .1); 
+  --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1); 
+}
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none !important;
+}
+
+/* The ::-webkit-scrollbar CSS pseudo-element affects the style of an element's scrollbar when it has overflow:scroll; set. */
+*::-webkit-scrollbar {
+  height: .5rem;
+  width: 1rem;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--blue);
+}
+
+html {
+  font-size: 62.5%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;
+
+}
+/* Style de la side-nav (menu latéral) */
+.side-nav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(to bottom left, #c2ccd1, #f8f8f8);
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 80px;
+  z-index: 999; /* C'est derrière l'overlay */
+}
+
+/* Lien dans la side-nav */
+.side-nav a {
+  padding: 20px 15px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.side-nav a:hover {
+  color: #f1f1f1;
+}
+/* Section utilisateur */
+
+.user {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+ background-color: #D3D9DD;
+  color: #f1f1f1; /* Couleur du texte */
+}
+
+/* Icône utilisateur */
+.user-icon {
+  font-size: 50px; /* Taille de l'icône */
+  color: #f1f1f1; /* Couleur de l'icône */
+  margin-right: 15px;
+}
+
+/* Image utilisateur */
+.user-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* Rendre l'image ronde */
+  margin-right: 15px;
+  object-fit: cover; /* Ajuste l'image à son conteneur */
+  display: none; /* Par défaut, masqué si l'icône est affichée */
+}
+
+/* Texte utilisateur */
+.user h2 {
+  font-size: 18px;
+  margin: 0;
+  color: #f1f1f1;
+}
+
+.user p {
+  font-size: 14px;
+  margin: 0;
+  color: #aaa;
+}
+
+
+/* Bouton de fermeture dans la side-nav */
+.side-nav .close-btn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  color: #818181;
+}
+
+.side-nav .close-btn:hover {
+  color: #fff;
+}
+
+/* Overlay : fond sombre lorsque la side nav est ouverte */
+.overlay {
+  display: none; /* Initialement masqué */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998; /* Juste en dessous de la side nav */
+}
+
+/* Affichage de l'overlay lorsque la side nav est ouverte */
+.side-nav.open + .overlay {
+  display: block;
+}
+
+/* Bouton d'ouverture du menu */
+.open-btn {
+  font-size: 30px;
+  color: black;
+  cursor: pointer;
+
+  display: block;
+  position: fixed; /* Positionnement fixe */
+  top: 20px; /* Position du haut */
+  left: 20px; /* Position du côté gauche */
+  z-index: 1000; /* Assurez-vous qu'il soit au-dessus des autres éléments */
+}
+
+  
+  #menu-btn:hover {
+    color: black;         /* Couleur au survol (blanc) */
+  }
+
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    height: 120vh;
+    max-height: 100%;
+    padding: 0;
+    margin-top: 100px;
+    background-image: linear-gradient(to bottom right, rgba(240, 236, 243, 0.8), rgba(255, 255, 255, 0.9));
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  
+  }
+  
+
+  
+  .section {
+    padding: 7rem 2rem;
+  }
+  
+  .heading {
+    text-align: center;
+    font-size: 4rem;
+    color: var(--black);
+    text-transform: uppercase;
+    font-weight: bolder;
+    margin-bottom: 3rem;
+  }
+  
+  .link-btn {
+    display: inline-block;
+    padding: 1rem 3rem;
+    border-radius: .5rem;
+    background-color: var(--blue);
+    cursor: pointer;
+    font-size: 1.7rem;
+    color: var(--white);
+  }
+  
+  .link-btn:hover {
+    background-color: rgb(224, 224, 240);
+    color: white;
+    transition: 0.3s;
+  }
+  
+  .header {
+    padding: 2rem;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  }
+  
+  .header.active {
+    background-color: var(--white);
+    box-shadow: var(--box-shadow);
+    border: 0;
+  }
+  
+  .header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-left: -5px;
+    align-items: center;
+    gap: 10px;
+    margin-top: -20px;
+  
+  }
+  
+  
+  .header .logo {
+    font-size: 3rem;
+    color: var(--black);
+  }
+  
+  .header .logo span {
+    color: var(--blue);
+  }
+  
+  .header .nav a {
+    margin: 0 1rem;
+    font-size: 1.7rem;
+    color: var(--black);
+  }
+  
+  .header .nav a:hover {
+    color: var(--blue);
+  }
+  /* Side Navigation */
+  main {
+    display: grid;
+    grid-template-columns: 100px 2fr;
+    /* Two columns with a 1:2 ratio */
+    /* Space between grid items */
+  
+  }
+  
+ 
+  
+ 
+  
+  .table-f {
+    background-color: #95a4b4;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .table td,
+  .table th {
+    font-size: 1.4rem;
+  }
+  .form-container {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    margin-top: 150px;
+  }
+  
+  .from {
+    width: 20px;
+  }
+  
+  .form-control {
+    width: 200px;
+  }
+  .form-container p {
+    text-align: center;
+    color: #7a7a7a;
+    margin-bottom: 20px;
+  }
+  .containerrr{
+    width: 90%;
+    margin-top: -190px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-sizing: border-box;
+    
+    align-self: center;
+
+  }
+  
+  
+  
+  .form-container h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+  }
+  input:focus {
+    border-color: #007BFF;
+    outline: none;
+  }
+  
+  .button-group {
+    justify-content: space-between;
+  }
+  .btn {
+    padding: 10px 15px;
+    font-size: 10px;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .sauvegarder {
+    background-color: var(--blue);
+  }
+  
+  .sauvegarder:hover {
+    background-color: #afbadf;
+    color: white;
+  }
+  
+  .annuler {
+    background-color:rgb(163, 163, 163);
+  }
+  
+  .annuler:hover {
+  opacity: 70%;
+    color: white;
+  }
+  
+
+  @media (max-width:768px) {
+
+    .container {
+      width: 300px;
+    }
+  
+    #menu-btn {
+      display: inline-block;
+      transition: .2s linear;
+    }
+  
+    #menu-btn.fa-times {
+      transform: rotate(180deg);
+    }
+  
+    .header .nav {
+      position: absolute;
+      top: 99%;
+      left: 0;
+      right: 0;
+      background-color: var(--white);
+      border-top: var(--border);
+      border-bottom: var(--border);
+      padding: 1rem 0;
+      text-align: center;
+      flex-flow: column;
+      clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+      transition: .2s linear;
+    }
+  
+    .header .nav.active {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+  
+    .header .nav a {
+      margin: 1rem 0;
+      font-size: 2rem;
+    }
+  
+  }
+  
+  /* Responsive design for screens smaller than 768px */
+  @media (max-width: 1024px) {
+  
+    .container {
+      width: 300px;
+    }
+  
+    .table {
+      display: block;
+      /* Make the table behave like a block element */
+    }
+  
+    .table thead {
+      display: none;
+      /* Hide table header for smaller screens */
+    }
+  
+    .table tr {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  
+    .table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      font-size: 1.4rem;
+      border: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    
+  
+    .table td:last-child {
+      border-bottom: none;
+    }
+  
+    .table td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      flex-basis: 40%;
+      text-align: left;
+      color: var(--light-color);
+      padding-right: 10px;
+    }
+  
+  }

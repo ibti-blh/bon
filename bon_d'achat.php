@@ -1,5 +1,14 @@
 <?php
-include 'db_conn.php'; 
+include 'db-conne.php'; 
+
+// Récupérer les fournisseurs dans un tableau
+$fournisseurs = [];
+$result = $conn->query("SELECT id, nom FROM fournisseur");
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $fournisseurs[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,6 +16,13 @@ include 'db_conn.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un Bon d'Achat</title>
+     <!-- font awesome cdn link  -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- bootstrap cdn link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css">
+    <!-- custom css file link  -->
+          <link rel="stylesheet" href="bon.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,29 +100,91 @@ include 'db_conn.php';
     </style>
 </head>
 <body>
+    <!-- Side Navigation -->
+
+<div id="side-nav" class="side-nav">
+  <div class="user">
+  <!-- Icône utilisateur -->
+  <i class="fas fa-user-circle user-icon"></i>
+  <!-- Image utilisateur -->
+  <img src="image/midoune.jpg" alt="Utilisateur" class="user-img">
+  <div>
+    <h2>midoune</h2>
+    <p>midoune@gmail.com</p>
+  </div>
+</div>
+  <a href="javascript:void(0)" class="close-btn" onclick="closeSideNav()">&times;</a>
+ 
+  <a href="../client/index.php">
+    <i class="fas fa-users"></i> Page de clients
+  </a>
+  <a href="./index.php">
+    <i class="fas fa-box-open"></i> Pages de produits
+  </a>
+  <a href="products.php">
+    <i class="fas fa-tooth"></i> Pages de prothèses
+  </a>
+  <a href="../fournisseur/suppliers.php">
+    <i class="fas fa-truck"></i> Fournisseur
+  </a>
+  <a href="bonds.php">
+    <i class="fas fa-file-invoice-dollar"></i> Bon d'achat
+  </a>
+  <a href="logout.php">
+    <i class="fas fa-sign-out-alt"></i> Déconnexion
+  </a>
+
+
+ 
+</div>
+
+
+<!-- Overlay -->
+<div id="overlay" class="overlay" onclick="closeSideNav()"></div>
+
+
+  <header class="header fixed-top">
+
+    <div class="container">
+
+      <div class="row align-items-center justify-content-between">
+        <div><img src="tooth.png" alt="logo">
+
+          <a href="#home" class="logo">Cabinet<span>Plus</span></a>
+        </div>
+
+        <nav class="nav">
+          <a href="#home">Accueil</a>
+          <a href="#about">About</a>
+          <a href="#review">Revues</a>
+          <a href="../page-dent/Calendrier/calendrier/calendar.html">Caldenrier</a>
+          <a href="#contact">Contact</a>
+        
+        </nav>
+        <button class="link-btn">Connexion</button>
+        
+        </div>
+      <!-- Icone du menu hamburger -->
+      <span class="open-btn" onclick="openSideNav()">&#9776;</span>
+      </div>
+  </header>
+  <!-- header section ends -->
+
     <div class="form-container">
         <h1>Créer un Bon d'Achat</h1>
         <form method="POST" action="create_bon_achat.php">
-            <!-- Fournisseur global -->
-            <div class="input-group">
-                <label for="fournisseur">Fournisseur Principal :</label>
-                <select name="fournisseur_id" required>
-                    <option value="">-- Sélectionnez un fournisseur principal --</option>
-                    <?php
-            // Requête pour récupérer les fournisseurs
-            $result = $conn->query("SELECT id, nom FROM fournisseur");
-            
-            if ($result->num_rows > 0) {
-                // Parcours des résultats pour afficher chaque fournisseur dans une option
-                while ($row = $result->fetch_assoc()) {
-                    echo "<option value='{$row['id']}'>{$row['nom']}</option>";
-                }
-            } else {
-                echo "<option value=''>Aucun fournisseur disponible</option>";
-            }
-            ?>
-                </select>
-            </div>
+                        <!-- Fournisseur principal -->
+                        <div class="input-group">
+                            <label for="fournisseur">Fournisseur Principal :</label>
+                            <select name="fournisseur_id" required>
+                                <option value="">-- Sélectionnez un fournisseur principal --</option>
+                                <?php foreach ($fournisseurs as $fournisseur): ?>
+                                    <option value="<?= htmlspecialchars($fournisseur['id']) ?>">
+                                        <?= htmlspecialchars($fournisseur['nom']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
             <!-- Articles -->
             <div id="articles">
@@ -144,18 +222,17 @@ include 'db_conn.php';
                         <label for="date_expiration">Date d'Expiration :</label>
                         <input type="date" name="date_expiration[]">
                     </div>
-                    <!-- Fournisseur spécifique pour cet article -->
-                    <div class="input-group">
-                        <label for="marque_fournisseur">Fournisseur de l'Article :</label>
-                        <select name="marque_fournisseur[]" required>
+                    
+                     <!-- Liste déroulante pour le fournisseur spécifique -->
+                     <div class="input-group">
+                        <label for="fournisseur_article">Fournisseur :</label>
+                        <select name="fournisseur_article[]">
                             <option value="">-- Sélectionnez un fournisseur --</option>
-                            <?php
-                            // Réinitialisation du pointeur pour afficher à nouveau les fournisseurs
-                            $result->data_seek(0); 
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['id']}'>{$row['nom']}</option>";
-                            }
-                            ?>
+                            <?php foreach ($fournisseurs as $fournisseur): ?>
+                                <option value="<?= htmlspecialchars($fournisseur['id']) ?>">
+                                    <?= htmlspecialchars($fournisseur['nom']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
@@ -163,10 +240,7 @@ include 'db_conn.php';
 
             <button type="button" class="add-article-btn" onclick="addArticle()">Ajouter un Article</button>
 
-            <!-- Montant Total -->
-            <div class="total-section">
-                <p id="total">Montant Total: 0.00</p>
-            </div>
+           
 
             <!-- Section Paiement -->
             <div class="input-group">
@@ -214,5 +288,11 @@ include 'db_conn.php';
             document.getElementById('montant_paiement').value = total.toFixed(2);
         }
     </script>
+    <!-- Script Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0/Yosjhf5VxqfGgI2T3Ybh+GkJt6+8zFgfYJ9UpqYjzMxBdXquHv8xNjw7" 
+            crossorigin="anonymous"></script>
+      </main>
+      <script src="bon.js"></script>
 </body>
 </html>
